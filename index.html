@@ -1,17 +1,19 @@
-
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="description" content="قسم الإدارة المدرسية  – الشهادات">
-<meta name="keywords" content=" تعليم جازان, الشهادات">
-<meta name="author" content="الإدارة المدرسية">
+<meta name="description" content="مدرسة تحفيظ ضمد الإبتدائية والمتوسطة – الشهادات">
+<meta name="keywords" content="تحفيظ القرآن, مدرسة ضمد, تعليم جازان, الشهادات">
+<meta name="author" content="مدرسة تحفيظ ضمد">
 
-<title>الشهادات - قسم الإدارة المدرسية </title>
+<title>الشهادات - مدرسة تحفيظ ضمد الإبتدائية والمتوسطة</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 
 <style>
   :root{
@@ -75,7 +77,7 @@
   .wrap{
     flex:1;
     width:100%;
-    max-width:560px;
+    max-width:760px;
     margin:40px auto;
     padding:0 16px;
   }
@@ -119,34 +121,29 @@
   }
   .search-box button:hover{opacity:.9;transform:translateY(-1px)}
 
-  #result{margin-top:22px;display:none;text-align:right}
-  #result.show{display:block}
-  .student{
-    background:#f0f9f5;
-    border:1px solid #cdeadd;
-    border-radius:12px;
-    padding:18px;
+  .status{margin-top:16px;font-weight:700;color:var(--dark)}
+
+  #pdfContainer{margin-top:16px}
+  #pdfContainer canvas{
+    width:100%;height:auto;
+    border:1px solid #e0e0e0;
+    border-radius:8px;
   }
-  .student p{color:var(--dark);margin-bottom:10px;font-weight:600}
-  .student a.btn-cert{
-    display:inline-block;
+
+  #downloadBtn{
+    display:none;
+    margin-top:16px;
+    padding:12px 26px;
     background:var(--blue);
     color:#fff;
-    text-decoration:none;
-    padding:10px 22px;
-    border-radius:8px;
+    border:none;
+    border-radius:10px;
+    font-family:inherit;
     font-weight:700;
+    font-size:1rem;
+    cursor:pointer;
   }
-  .student a.btn-cert:hover{background:var(--dark)}
-  .notfound{
-    background:#fdf1f1;
-    border:1px solid #f3caca;
-    color:#a33;
-    border-radius:12px;
-    padding:16px;
-    font-weight:600;
-    text-align:center;
-  }
+  #downloadBtn:hover{background:var(--dark)}
 
   /* ===== FOOTER ===== */
   footer{
@@ -154,9 +151,11 @@
     color:#fff;
     text-align:center;
     padding:18px 10px;
-    font-size:.85rem;
-    line-height:1.8;
+    font-size:.9rem;
+    line-height:2;
   }
+  footer a{color:#9fd8c3;text-decoration:none;margin:0 6px}
+  footer a:hover{color:#fff}
 
   /* ===== WHATSAPP ===== */
   .whatsapp-float{
@@ -187,7 +186,7 @@
 <!-- ===== HEADER ===== -->
 <header class="hero">
   <img class="logo" src="logo.png" alt="وزارة التعليم - الإدارة العامة للتعليم بمنطقة جازان">
-  <h1>الإدارة المدرسية</h1>
+  <h1>مدرسة تحفيظ ضمد الإبتدائية والمتوسطة</h1>
   <p>الإدارة العامة للتعليم بمنطقة جازان</p>
 </header>
 
@@ -201,22 +200,28 @@
 <!-- ===== CONTENT ===== -->
 <div class="wrap">
   <div class="card">
-    <h2>استخراج الشهادة</h2>
-    <p class="sub">أدخل رقم الهوية / السجل المدني للموظف لعرض الشهادة</p>
+    <h2>الاستعلام عن إشعار الدرجات</h2>
+    <p class="sub">أدخل السجل المدني المكوّن من 10 أرقام</p>
 
     <div class="search-box">
-      <input type="text" id="sid" inputmode="numeric" maxlength="10" placeholder="رقم الهوية">
-      <button onclick="findCert()">بحث</button>
+      <input type="text" id="studentId" inputmode="numeric" maxlength="10" placeholder="أدخل رقم الهوية الوطنية">
+      <button onclick="searchCertificate()"><i class="fa fa-search"></i> بحث</button>
     </div>
 
-    <div id="result"></div>
+    <div id="result" class="status"></div>
+    <div id="pdfContainer"></div>
+    <button id="downloadBtn">تحميل الشهادة PDF</button>
   </div>
 </div>
 
 <!-- ===== FOOTER ===== -->
 <footer>
-  جميع الحقوق محفوظة © 2026<br>
-  الإدارة المدرسية-تعليم جازان
+  <div>👨‍💻 البرمجة والتصميم: م. خليل أبوحوزه
+    <a href="https://wa.me/966548884252" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    <a href="https://www.facebook.com/khalil.abuhozah" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+    <a href="https://x.com/abuhawzah" target="_blank" aria-label="X"><i class="fab fa-x-twitter"></i></a>
+  </div>
+  <div>جميع الحقوق محفوظة &copy; 2026 - مدرسة تحفيظ ضمد الإبتدائية والمتوسطة</div>
 </footer>
 
 <!-- ===== WHATSAPP FLOAT ===== -->
@@ -228,44 +233,84 @@
 </a>
 
 <script>
-/* =========================================================
-   بيانات الطلاب:
-   أضف كل طالب بهذا الشكل:
-   "رقم الهوية": { name: "اسم الطالب", grade: "الصف", file: "certs/اسم-الملف.pdf" }
-   وضع ملفات الشهادات PDF داخل مجلد باسم certs بجانب هذا الملف
-   ========================================================= */
-const students = {
-  "1234567890": { name: "مثال: محمد أحمد", grade: "السادس الابتدائي", file: "certs/1234567890.pdf" }
-};
+  let foundPage = null;
+  let pdfDoc = null;
 
-function findCert(){
-  const id = document.getElementById('sid').value.trim();
-  const box = document.getElementById('result');
-  box.classList.add('show');
+  async function searchCertificate() {
+    const studentId = document.getElementById('studentId').value.trim();
+    const resultDiv = document.getElementById('result');
+    const pdfContainer = document.getElementById('pdfContainer');
+    const downloadBtn = document.getElementById('downloadBtn');
 
-  if(!id){
-    box.innerHTML = '<div class="notfound">الرجاء إدخال رقم الهوية</div>';
-    return;
+    pdfContainer.innerHTML = "";
+    resultDiv.textContent = "";
+    downloadBtn.style.display = "none";
+
+    if (studentId.length !== 10 || isNaN(studentId)) {
+      resultDiv.textContent = "رقم الهوية غير صحيح. يجب أن يتكون من 10 أرقام.";
+      return;
+    }
+
+    resultDiv.textContent = "جاري البحث...";
+    const pdfFiles = ['uploads/1.pdf','uploads/2.pdf','uploads/3.pdf','uploads/4.pdf','uploads/5.pdf'];
+    let certificateFound = false;
+
+    for (const pdfFile of pdfFiles) {
+      try {
+        pdfDoc = await pdfjsLib.getDocument(pdfFile).promise;
+        for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+          const page = await pdfDoc.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          const text = textContent.items.map(item => item.str).join(" ");
+          if (text.includes(studentId)) {
+            displayCertificatePage(page, pdfContainer);
+            foundPage = pageNum;
+            downloadBtn.style.display = "inline-block";
+            certificateFound = true;
+            break;
+          }
+        }
+      } catch (e) {
+        console.error("PDF load error:", e);
+      }
+      if (certificateFound) break;
+    }
+
+    resultDiv.textContent = certificateFound ? "✅ تم العثور على الشهادة." : "❌ لم يتم العثور على شهادة لهذا الرقم.";
   }
 
-  const s = students[id];
-  if(s){
-    box.innerHTML = `
-      <div class="student">
-        <p>الاسم: ${s.name}</p>
-        <p>الصف: ${s.grade}</p>
-        <a class="btn-cert" href="${s.file}" target="_blank">
-          <i class="fas fa-download"></i> تحميل الشهادة
-        </a>
-      </div>`;
-  }else{
-    box.innerHTML = '<div class="notfound">لم يتم العثور على شهادة بهذا الرقم، تأكد من رقم الهوية</div>';
+  function displayCertificatePage(page, container) {
+    const viewport = page.getViewport({ scale: 1.5 });
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    page.render({ canvasContext: context, viewport: viewport }).promise.then(() => {
+      container.appendChild(canvas);
+    });
   }
-}
 
-document.getElementById('sid').addEventListener('keydown', e => {
-  if(e.key === 'Enter') findCert();
-});
+  async function downloadCertificate() {
+    if (foundPage && pdfDoc) {
+      const pdfBytes = await pdfDoc.getData();
+      const existingPdfBytes = new Uint8Array(pdfBytes);
+      const pdfDocNew = await PDFLib.PDFDocument.load(existingPdfBytes);
+      const newPdf = await PDFLib.PDFDocument.create();
+      const [copiedPage] = await newPdf.copyPages(pdfDocNew, [foundPage - 1]);
+      newPdf.addPage(copiedPage);
+      const newPdfBytes = await newPdf.save();
+      const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `الشهادة_${foundPage}.pdf`;
+      link.click();
+    }
+  }
+  document.getElementById('downloadBtn').addEventListener('click', downloadCertificate);
+
+  document.getElementById('studentId').addEventListener('keydown', e => {
+    if (e.key === 'Enter') searchCertificate();
+  });
 </script>
 
 </body>
